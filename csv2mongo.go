@@ -1,12 +1,12 @@
 package main
 
 import (
-	"log"
+	"encoding/json"
 	"flag"
 	"fmt"
-	"encoding/json"
-	"gopkg.in/mgo.v2"
 	"github.com/ruiclarateixeira/csv2json"
+	"gopkg.in/mgo.v2"
+	"log"
 )
 
 func main() {
