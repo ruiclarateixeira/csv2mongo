@@ -1,12 +1,13 @@
 package main
 
 import (
-	"encoding/json"
-	"flag"
 	"fmt"
-	"github.com/ruiclarateixeira/csv2json"
-	"gopkg.in/mgo.v2"
 	"log"
+	"flag"
+	"encoding/json"
+	"gopkg.in/mgo.v2"
+	"github.com/segmentio/go-prompt"
+	"github.com/ruiclarateixeira/csv2json"
 )
 
 func main() {
@@ -14,6 +15,8 @@ func main() {
 	url := flag.String("url", "", "Mongo URL")
 	database := flag.String("db", "", "Target Mongo Db Name")
 	collection := flag.String("coll", "", "Collection Name")
+	username := flag.String("user", "", "Mongo Username")
+	password := flag.String("pwd", "", "Mongo Password")
 
 	flag.Parse()
 
@@ -42,10 +45,17 @@ func main() {
 		log.Fatal(Err)
 	}
 
-	c := session.DB(*database).C(*collection)
+	db := session.DB(*database)
 
+	if *username != ""  && *password == "" {
+		input := prompt.Password("Please enter the password for " + *username)
+		password = &input
+	}
+	
+	db.Login(*username, *password)
+	
 	for _, document := range jsonResult {
-		Err = c.Insert(document)
+		Err = db.C(*collection).Insert(document)
 
 		if Err != nil {
 			log.Fatal(Err)
